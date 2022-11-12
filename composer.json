@@ -4,5 +4,10 @@
     },
     "scripts": {
         "phpunit": "vendor/bin/phpunit"
+    },
+    "autoload": {
+        "psr-4":{
+            "":"src/"
+        }
     }
 }

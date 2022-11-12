@@ -1,7 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-require "User.php";
+// require "User.php";
 
 class UserTest extends TestCase
 {
@@ -12,18 +12,18 @@ class UserTest extends TestCase
         $user->first_name = "Teresa";
         $user->surname = "Green";
 
-        $this->assertEquals('Teresa Green',$user->getFullName());
+        $this->assertEquals('Teresa Green', $user->getFullName());
     }
 
     public function testFullNameIsEmptyByDefault()
     {
         $user = new User;
 
-        $this->assertEquals('',$user->getFullName());
+        $this->assertEquals('', $user->getFullName());
     }
 
     /**
-     * @test 
+     * @test
      */
     public function user_has_first_name()
     {
@@ -31,6 +31,35 @@ class UserTest extends TestCase
 
         $user->first_name = "Teresa";
 
-        $this->assertEquals('Teresa',$user->first_name);
+        $this->assertEquals('Teresa', $user->first_name);
+    }
+
+    public function testNotificationIsSent()
+    {
+        $user = new User;
+
+        $mockMailer = $this->createMock(Mailer::class);
+        $mockMailer->expects($this->once())
+            ->method('sendMessage')
+            ->with($this->equalTo('me@example.com'), $this->equalTo('Hello'))
+            ->willReturn(true);
+
+        $user->setMailer($mockMailer);
+
+        $user->email = "me@example.com";
+
+        $this->assertTrue($user->notify("Hello"));
+    }
+
+    public function testCannotNotigyUserWithNoEmail()
+    {
+        $user = new User;
+        $mockMailer = $this->getMockBuilder(Mailer::class)
+            ->onlyMethods([])
+            ->getMock();
+
+        $user->setMailer($mockMailer);
+        $this->expectException(Exception::class);
+        $user->notify("Hello");
     }
 }
